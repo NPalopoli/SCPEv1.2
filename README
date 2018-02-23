@@ -1,0 +1,147 @@
+SCPE : Structurally Constrained Protein Evolution 
+ 
+Copyright (C) Gustavo Parisi and Julian Echave. 2001-2006
+Contact: Gustavo Parisi: gustavo@unq.edu.ar
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+ 
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+
+
+DESCRIPTION
+
+SCPE simulates sequence divergence under the structural constraints present in protein folds.
+The program introduces random mutations in a sequence of known crystallographic structure and select them 
+against to much structural deviation. The main output of the program is a whole set of site-specific 
+substitutions matrices with their equilibrium frequencies. These files could be used in maximum 
+likelihood calculations in programs of molecular evolution that allows the inclusion of site-specific matrices.
+An excellent choice is the program HYPHY (http://www.hyphy.org). In SCPE web page there are some examples of script
+files using SCPE matrices and HYPHY to perform maximum likelihood calculations. 
+
+
+INSTALLATION
+
+
+For the installation of SCPE in Lynux based systems first untar the file SCPE.tgz using
+
+
+tar -xvf SCPE.tar
+
+This will generate a directory called SCPEv1. 
+Type in the command line 
+
+make
+
+This will compile the source generating the executable scpe.exe
+
+
+USAGE
+
+
+The input for a SCPE simulation is a file containing the coordinates of a protein structure. All the information for running the program 
+is contained in a file called inputfile.in (the name is irrelevant).
+
+The program takes the input file from the command line:
+
+./scpe.exe inputfile.in
+
+
+Bellow we reproduce the contents of the inputfile.in file. Lines starting with an asterisk are comments.
+
+
+
+***************************************************************************************************************
+
+*PDB INFORMATION
+
+PDB FILENAME= ./PDB/1lxa.ent
+PROTEIN CHAIN= A 
+
+
+MULTIMER PROTEIN MODE = 0
+HOMOOLIGOMER = 0
+ALIGNMENT FILE = ./Example/lpxa70.fasta
+*leaving empy the ALIGNMENT FILE only the pdb sequence will be taken for the simulations
+
+
+*RUN INFORMATION
+
+BETA FROM LIST = 0
+LIST NAME = betalist.dat
+INITIAL BETA PARAMETER= 0.15
+SCREENING BETA-STEP= 0.2
+MAXIMUM BETA= 0.40 
+
+MUTATION MATRIX= QijCodonesEmp
+
+
+INITIAL NUMBER OF ACCEPTED SUSTITUTIONS PER SITE= 10.0
+STEP OF ACCEPTED SUSTITUTIONS PER SITE= 1000.0
+MAXIMUM NUMBER OF ACCEPTED SUSTITUTIONS PER SITE= 200.0
+NUMBER OF INDEPENDENT RUNS= 6000
+
+*OUTPUT INFORMATION
+
+RESULTS FILENAME= lpxa
+
+*Name to be printed in HYPHY input matrices
+
+MODEL NAME = lpxa
+PATH TO RESULTS = 
+
+
+************************************************************************************************************
+
+In order to run SCPE a crystallographic structure for the reference protein should be available. The name of this file should be entered in the 
+field "PDB FILENAME" and the name of the corresponding chain should be entered in "PROTEIN CHAIN". In the case that there is only one chain 
+without any name, leave this field empty.
+
+In the case the protein you are interested in is oligomeric, the field "MULTIMERIC PROTEIN MODE" should be activated with a "1". This  
+forces the SCPE to take into account the protein-protein interactions between the different chain in the oligomers.  If the oligomer is a 
+homo-oligomer put "1" in the field "HOMOOLIGOMER". If the oligomer is a heterooligomer write "0" in this field.
+
+SCPE could take into account an alignment of homologous proteins containing the reference sequence (the one with known crystallographic structure). 
+This alignment is used to derive initial amino acid distributions for each position. The format of this alignment should be FASTA and it should be 
+edited in the way that the reference sequence does not contain gaps. Of course, gaps are allowed in other sequences (see an example included in the Example 
+directory contained in the SCPE distribution)
+
+SCPE contains a parameter called beta that is a measure of the selective pressure for structural conservation. In general a value of 0.15 
+(field "INITIAL BETA PARAMETER") should be fine. However user could be interested in finding the beta parameter that better fit the substitution 
+pattern in the protein of interest. In this case, the SCPE could take a series of beta values from a list "LIST NAME" that should be activate with 
+a "1" in the field "BETA FROM LIST". In the case "BETA FROM LIST" is "0", SCPE should take the "INITIAL BETA PARAMETER" value, and each run add a 
+given step "SCREENING BETA-STEP" until a maximum beta value is reached "MAXIMUM BETA". 
+
+The field "INITIAL NUMBER OF ACCEPTED SUSTITUTIONS PER SITE" is a measure of the divergence reached at the end of the simulation. As explained before 
+for the beta parameter, SCPE can run several runs for different number of accepted substitutions per site could be using the fields 
+"STEP OF ACCEPTED SUSTITUTIONS PER SITE" and "MAXIMUM NUMBER OF ACCEPTED SUSTITUTIONS PER SITE".
+
+Also should be indicated the number of independent runs in order to reach convergence. This value is strongly correlated with the length of the proteins. 
+A number of 6000 independent runs is fine for a protein of about 250 residues.
+
+The SCPE also uses a mutational matrix. The default mutation matrix is the one obtained by Scheider and collaborators 
+(Scheneider, A, Cannarozzi, G and Gonnet, G "Empirical codon substitution matrix BMC Bioinformatics, 2006). 
+
+Finally, other fields contain information about the output name files "RESULTS FILENAME", model name "MODEL NAME" and path to result files "PATH TO RESULTS".
+
+
+If you use SCPE, please cite
+
+* Structural constraints and emergence of sequence patterns in protein evolution. Parisi, G. and Echave, J. 
+Molecular Biology and Evolution.18 (5): 750-756, 2001
+
+* Quaternary structure constraints on evolutionary sequence divergence. Fornasari, MS, Parisi, G and Echave, J.  
+Molecular Biology and Evolution, 24(2):349-51. 2007
+
+
+
